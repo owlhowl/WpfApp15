@@ -30,11 +30,10 @@ namespace WpfApp15
             this.model = model;
             UpdateGroups();
 
-            EditSelectedStudent = new MvvmCommand(
-                () => 
+            EditSelectedStudent = new MvvmCommand(() => 
                 { 
                     PageManager.ChangePageTo(PageType.EditStudent); 
-                    model.EditStudent(SelectedStudent); 
+                    model.EditStudent(SelectedStudent);
                 },
                 () => SelectedStudent != null);
 
