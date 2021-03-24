@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WpfApp15
 {
-    class Student 
+    public class Student 
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

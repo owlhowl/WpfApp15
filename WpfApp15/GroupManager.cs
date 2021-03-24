@@ -1,35 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Text.Json;
 
 namespace WpfApp15
 {
     class GroupManager
     {
-        public List<Group> Groups { get; set; } = new List<Group>();
+        public List<Group> Groups { get; set; }
 
         public GroupManager()
         {
-            Groups.Add(new Group { GroupName = "1125" });
-        }
-        
-        internal void Edit(Group selectedGroup, Student selectedStudent)
-        {
-            throw new NotImplementedException();
+            LoadGroupList();
         }
 
-        internal void Remove(Group selectedGroup, Student selectedStudent)
+        internal void RemoveStudent(Group selectedGroup, Student selectedStudent)
         {
-            Groups.Find(g => g == selectedGroup).Students.Remove(selectedStudent);
+            selectedGroup.Students.Remove(selectedStudent);
+            SaveGroupList();
         }
 
-        internal void CreateStudent(Group selectedGroup)
+        internal Student CreateStudent(Group selectedGroup)
         {
-            Groups.Find(g => g == selectedGroup).Students.Add(new Student { LastName = "Example"});
+            Student newStudent = new Student();
+            selectedGroup.Students.Add(newStudent);
+            return newStudent;
+        }
+
+        internal void RemoveGroup(Group selectedGroup)
+        {
+            Groups.Remove(selectedGroup);
+            SaveGroupList();
+        }
+
+        internal void CreateGroup(string createGroupName)
+        {
+            Groups.Add(new Group { GroupName = createGroupName });
+            SaveGroupList();
+        }
+
+        const string path = "groups.db";
+
+        public void SaveGroupList()
+        {
+            var json = JsonSerializer.Serialize(Groups, typeof(List<Group>));
+            File.WriteAllText(path, json);
+        }
+
+        public void LoadGroupList()
+        {
+            string file = path;
+            if (!File.Exists(file) || new FileInfo(file).Length == 0)
+            {
+                Groups = new List<Group>();
+                return;
+            }
+            string json = File.ReadAllText(file);
+            Groups = (List<Group>)JsonSerializer.Deserialize(json, typeof(List<Group>));
+            Groups.Sort((s1, s2) => s1.GroupName.CompareTo(s2.GroupName));
         }
     }
 
-    class Group
+    public class Group
     {
         public string GroupName { get; set; }
         public List<Student> Students { get; set; } = new List<Student>();

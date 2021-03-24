@@ -5,38 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp15"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"  WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <local:MainVM/>
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition />
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <Menu>
             <MenuItem Header="Группы" Command="{Binding OpenGroupList}" />
+            <MenuItem Header="Студенты" Command="{Binding OpenStudentList}" />
         </Menu>
-        <StackPanel Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal">
-            <TextBlock Text="Выбранная группа:"/>
-            <ComboBox DisplayMemberPath="GroupName" ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}"/>
-        </StackPanel>
-        <ListView Grid.Row="2" ItemsSource="{Binding Students}" SelectedItem="{Binding SelectedStudent}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="ФИО" DisplayMemberBinding="{Binding FullName}" />
-                    <GridViewColumn Header="Адрес" DisplayMemberBinding="{Binding Address}" />
-                </GridView>
-            </ListView.View>
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Добавить" Command="{Binding CreateStudent}"/>
-                    <MenuItem Header="Редактировать" Command="{Binding EditSelectedStudent}" CommandParameter="{Binding SelectedStudent}"/>
-                    <MenuItem Header="Удалить" Command="{Binding RemoveSelectedStudent}" CommandParameter="{Binding SelectedStudent}"/>
-                </ContextMenu>
-            </ListView.ContextMenu>
-        </ListView>
+        <Frame Grid.Row="1" Content="{Binding CurrentPage}" NavigationUIVisibility="Hidden"/>
     </Grid>
 </Window>
 

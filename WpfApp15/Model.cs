@@ -1,39 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace WpfApp15
 {
-    internal class Model
+    public class Model
     {
         GroupManager groupManager;
+
+        public List<Group> Groups { get => groupManager.Groups; }
+        
         public event EventHandler StudentsChanged;
+        public event EventHandler GroupsChanged;
+        public event EventHandler<Student> SelectedStudentChanged;
+
+        internal void SaveStudent()
+        {
+            groupManager.SaveGroupList();
+            StudentsChanged?.Invoke(this, null);
+        }
+
+        internal void NoSaveStudent()
+        {
+            groupManager.LoadGroupList();
+            StudentsChanged?.Invoke(this, null);
+        }
 
         public Model()
         {
             groupManager = new GroupManager();
         }
 
-        public List<Group> GetGroups()
+        internal bool CanSave(Student student)
         {
-            return groupManager.Groups;
+            return student != null && !(string.IsNullOrWhiteSpace(student.FirstName) || string.IsNullOrWhiteSpace(student.LastName));
         }
 
-        internal void EditStudent(Group selectedGroup, Student selectedStudent)
+        internal void CreateGroup(string createGroupName)
         {
-            groupManager.Edit(selectedGroup, selectedStudent);
-            StudentsChanged?.Invoke(this, null);
+            if (Groups.Contains(Groups.FirstOrDefault(g => g.GroupName == createGroupName)))
+                return;
+            groupManager.CreateGroup(createGroupName);
+            groupManager.LoadGroupList();
+            GroupsChanged?.Invoke(this, null);
+        }
+
+        internal void RemoveGroup(Group selectedGroup)
+        {
+            groupManager.RemoveGroup(selectedGroup);
+            GroupsChanged?.Invoke(this, null);
+        }
+
+        internal void EditStudent(Student selectedStudent)
+        {
+            SelectedStudentChanged?.Invoke(this, selectedStudent);
         }
 
         internal void RemoveStudent(Group selectedGroup, Student selectedStudent)
         {
-            groupManager.Remove(selectedGroup, selectedStudent);
+            groupManager.RemoveStudent(selectedGroup, selectedStudent);
             StudentsChanged?.Invoke(this, null);
         }
 
-        internal void CreateStudent(Group selectedGroup)
+        internal Student CreateStudent(Group selectedGroup)
         {
-            groupManager.CreateStudent(selectedGroup);
-            StudentsChanged?.Invoke(this, null);
+            return groupManager.CreateStudent(selectedGroup);
+            //StudentsChanged?.Invoke(this, null);
+        }
+
+        internal void LoadGroups()
+        {
+            groupManager.LoadGroupList();
+            GroupsChanged?.Invoke(this, null);
         }
     }
 }

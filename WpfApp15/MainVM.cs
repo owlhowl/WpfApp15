@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
+using System.Windows.Controls;
 using Mvvm1125;
 
 namespace WpfApp15
@@ -9,32 +11,26 @@ namespace WpfApp15
     {
         Model model;
 
-        public List<Group> Groups { get; set; }
-        public List<Student> Students { get; set; }
+        public Page CurrentPage { get; set; }
 
-        public Group SelectedGroup { get; set; }
-        public Student SelectedStudent { get; set; }
-
-        public MvvmCommand EditSelectedStudent { get; set; }
-        public MvvmCommand RemoveSelectedStudent { get; set; }
-        public MvvmCommand CreateStudent { get; set; }
-
+        public MvvmCommand OpenGroupList { get; set; }
+        public MvvmCommand OpenStudentList { get; set; }
 
         public MainVM()
         {
             model = new Model();
-            Groups = model.GetGroups();
-            EditSelectedStudent = new MvvmCommand(() => model.EditStudent(SelectedGroup, SelectedStudent), () => SelectedStudent != null);
-            RemoveSelectedStudent = new MvvmCommand(() => model.RemoveStudent(SelectedGroup, SelectedStudent), () => SelectedStudent != null);
-            CreateStudent = new MvvmCommand(() => model.CreateStudent(SelectedGroup), () => true);
+            PageManager.SetModel(model);
+            CurrentPage = PageManager.GetPageByType(PageType.StudentList);
+            PageManager.CurrentPageChanged += PageManager_CurrentPageChanged;
 
-            model.StudentsChanged += Model_StudentsChanged;
+            OpenGroupList = new MvvmCommand(() => PageManager.ChangePageTo(PageType.GroupList), () => true);
+            OpenStudentList = new MvvmCommand(() => PageManager.ChangePageTo(PageType.StudentList), () => true);
         }
 
-        private void Model_StudentsChanged(object sender, EventArgs e)
+        void PageManager_CurrentPageChanged(object sender, PageType e)
         {
-            Students = SelectedGroup.Students;
-            NotifyPropertyChanged("Students");
+            CurrentPage = PageManager.GetPageByType(e);
+            NotifyPropertyChanged("CurrentPage");
         }
     }
 }
